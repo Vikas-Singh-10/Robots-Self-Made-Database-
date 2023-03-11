@@ -1,46 +1,33 @@
-import React, {Component} from "react";
+import React, {useState} from "react";
 import CardList from "./CardList";
 import { robots } from './robots.js';
 import SearchBox from './SearchBox.js';
 import './App.css';
 import Scroll from "./Scroll.js";
 
-class App extends Component{
-    constructor(){
-        super()
-        this.state = {
-            robots: [],
-            searchfield: ''
-        }
-    }
-    componentDidMount(){
-        fetch('https://jsonplaceholder.typicode.com/users')
-        .then(response => response.json())
-        .then(users => this.setState({robots: users}));
+const App = () => {
+    const [searchfield, setSearchfield] = useState('');
+
+    const onSearchChange = (event) => {
+        setSearchfield(event.target.value);
     }
 
-    onSearchChange = (event) => {
-        this.setState({ searchfield: event.target.value });
+    const filteredRobots = robots.filter(robots => {
+            return robots.name.toLowerCase().includes(searchfield.toLowerCase());
+    })
+    if(!robots){
+        return <h1>LOADING</h1>
     }
-
-    render() {
-        const filteredRobots = this.state.robots.filter(robots => {
-            return robots.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
-        })
-        if(robots.length === 0){
-            return <h1>LOADING</h1>
-        }
-        else{
-            return (
-                <div className="tc">
-                    <h1 className="f1">Robo Freak</h1>
-                    <SearchBox searchchange={this.onSearchChange}/>
-                    <Scroll>
-                       <CardList robots={filteredRobots}/>
-                    </Scroll>
-                </div>
-            )
-        }
+    else{
+        return (
+            <div className="tc">
+                <h1 className="f1">Robo Freak</h1>
+                <SearchBox searchchange={onSearchChange}/>
+                <Scroll>
+                    <CardList robots={filteredRobots}/>
+                </Scroll>
+            </div>
+        )
     }
 }
 
